@@ -122,6 +122,13 @@ case class RS_Add(inputExpressions: Seq[Expression])
   }
 }
 
+case class RS_Private_Add(inputExpressions: Seq[Expression])
+    extends InferredExpression(MapAlgebra.add_private _) {
+  protected def withNewChildrenInternal(newChildren: IndexedSeq[Expression]) = {
+    copy(inputExpressions = newChildren)
+  }
+}
+
 // Subtract two bands
 case class RS_Subtract(inputExpressions: Seq[Expression])
     extends InferredExpression(MapAlgebra.subtract _) {

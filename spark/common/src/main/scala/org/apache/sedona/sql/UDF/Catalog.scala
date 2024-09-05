@@ -243,6 +243,7 @@ object Catalog {
     function[RS_LessThan](),
     function[RS_LessThanEqual](),
     function[RS_Add](),
+    function[RS_Private_Add](),
     function[RS_Subtract](),
     function[RS_Divide](),
     function[RS_MultiplyFactor](),

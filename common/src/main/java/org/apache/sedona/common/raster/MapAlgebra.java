@@ -296,6 +296,11 @@ public class MapAlgebra {
     return result;
   }
 
+  public static double[] add_private(double[] band1, double band2) {
+    // TODO
+    throw new RuntimeException("Method not completed");
+  }
+
   /**
    * @param band1 band values
    * @param band2 band values
