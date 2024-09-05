@@ -18,12 +18,12 @@
   -->
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
     <modelVersion>4.0.0</modelVersion>
-    <parent>
-        <groupId>org.apache</groupId>
-        <artifactId>apache</artifactId>
-        <version>23</version>
-        <relativePath />
-    </parent>
+<!--    <parent>-->
+<!--        <groupId>org.apache</groupId>-->
+<!--        <artifactId>apache</artifactId>-->
+<!--        <version>23</version>-->
+<!--        <relativePath />-->
+<!--    </parent>-->
     <groupId>org.apache.sedona</groupId>
     <artifactId>sedona-parent</artifactId>
     <version>1.6.1-SNAPSHOT</version>
@@ -82,12 +82,13 @@
         <!-- Actual scala, spark and log4j version will be set by activated profiles.
              Setting a default value helps IDE:s that can't make sense of profiles. -->
         <scala.compat.version>2.12</scala.compat.version>
-        <spark.version>3.3.0</spark.version>
-        <spark.compat.version>3.3</spark.compat.version>
-        <log4j.version>2.17.2</log4j.version>
+        <spark.version>3.5.4-SNAPSHOT</spark.version>
+        <spark.compat.version>3.5</spark.compat.version>
+        <log4j.version>2.20.0</log4j.version>
 
         <flink.version>1.19.0</flink.version>
-        <slf4j.version>1.7.36</slf4j.version>
+        <!--  change slf4j version to 2.0.7 to fit log4j used in spark 3.5 -->
+        <slf4j.version>2.0.7</slf4j.version>
         <googles2.version>2.0.0</googles2.version>
         <uberh3.version>4.1.1</uberh3.version>
         <scalatest.version>3.1.1</scalatest.version>
@@ -732,12 +733,14 @@
                     <name>spark</name>
                     <value>3.3</value>
                 </property>
-                <activeByDefault>true</activeByDefault>
+                <activeByDefault>false</activeByDefault>
             </activation>
             <properties>
                 <spark.version>3.3.0</spark.version>
                 <spark.compat.version>3.3</spark.compat.version>
                 <log4j.version>2.17.2</log4j.version>
+                <!-- Skip deploying parent module. it will be deployed with sedona-spark-3.3 -->
+                <skip.deploy.common.modules>true</skip.deploy.common.modules>
             </properties>
         </profile>
         <profile>
@@ -765,11 +768,11 @@
                 </property>
             </activation>
             <properties>
-                <spark.version>3.5.0</spark.version>
+                <spark.version>3.5.4-SNAPSHOT</spark.version>
                 <spark.compat.version>3.5</spark.compat.version>
                 <log4j.version>2.20.0</log4j.version>
                 <!-- Skip deploying parent module. it will be deployed with sedona-spark-3.3 -->
-                <skip.deploy.common.modules>true</skip.deploy.common.modules>
+<!--                <skip.deploy.common.modules>true</skip.deploy.common.modules>-->
             </properties>
         </profile>
         <profile>
@@ -812,9 +815,9 @@
                 <module>common</module>
                 <module>spark</module>
                 <module>spark-shaded</module>
-                <module>flink</module>
-                <module>flink-shaded</module>
-                <module>snowflake</module>
+<!--                <module>flink</module>-->
+<!--                <module>flink-shaded</module>-->
+<!--                <module>snowflake</module>-->
             </modules>
         </profile>
         <profile>

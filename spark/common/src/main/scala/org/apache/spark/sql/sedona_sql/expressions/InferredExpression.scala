@@ -194,6 +194,8 @@ object InferrableType {
     new InferrableType[java.util.List[java.lang.Double]] {}
   implicit val javaGeomListInstance: InferrableType[java.util.List[Geometry]] =
     new InferrableType[java.util.List[Geometry]] {}
+  implicit val fheCipherMatInstance: InferrableType[org.ade.SpatialFHE.spatialfhe.CipherMat] =
+    new InferrableType[org.ade.SpatialFHE.spatialfhe.CipherMat] {}
 }
 
 object InferredTypes {

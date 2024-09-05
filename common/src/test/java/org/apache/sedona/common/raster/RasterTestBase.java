@@ -27,6 +27,7 @@ import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import javax.media.jai.RasterFactory;
+import org.ade.SpatialFHE.FHEHelper;
 import org.geotools.coverage.grid.GridCoordinates2D;
 import org.geotools.coverage.grid.GridCoverage2D;
 import org.geotools.coverage.grid.GridCoverageFactory;
@@ -60,6 +61,17 @@ public class RasterTestBase {
   byte[] geoTiff;
   byte[] testNc;
   String ncFile = resourceFolder + "raster/netcdf/test.nc";
+  String fhelibPath =
+      "/home/ubuntu/projects/SpatialFHE/build/SpatialFHE/java/SpatialFHE-linux-x86-64/src/main/resources/SpatialFHE-linux-x86-64/libjniSpatialFHE.so";
+  String fheJsonConfig =
+      "{"
+          + "\"SchemeType\": \"CKKS\","
+          + "\"PolyModulusDegree\": 8192,"
+          + "\"PlaintextModulus\": 0,"
+          + "\"CoeffModulusPrimes\": [],"
+          + "\"CoeffModulusBits\": [60, 30, 30, 30, 60],"
+          + "\"ScaleFactor\": 30"
+          + "}";
 
   @Before
   public void setup() throws IOException {
@@ -70,6 +82,12 @@ public class RasterTestBase {
     geoTiff = bos.toByteArray();
     File file = new File(ncFile);
     testNc = Files.readAllBytes(file.toPath());
+    FHEHelper.getOrCreate(
+        resourceFolder + "tmp/public.key",
+        resourceFolder + "tmp/private.key",
+        fhelibPath,
+        fheJsonConfig,
+        true);
   }
 
   GridCoverage2D createEmptyRaster(int numBands) throws FactoryException {
