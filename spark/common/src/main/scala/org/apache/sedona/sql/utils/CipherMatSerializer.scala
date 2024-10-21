@@ -16,18 +16,17 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.spark.sql.sedona_sql.UDT
+package org.apache.sedona.sql.utils
 
 import org.ade.SpatialFHE.spatialfhe.CipherMat
-import org.apache.spark.sql.types.UDTRegistration
-import org.locationtech.jts.geom.Geometry
-import org.locationtech.jts.index.SpatialIndex
+import org.apache.sedona.common.fheSerde;
 
-object UdtRegistratorWrapper {
+object CipherMatSerializer {
+  def serialize(cipherMat: CipherMat): Array[Byte] = {
+    fheSerde.CipherMatSerializer.serialize(cipherMat)
+  }
 
-  def registerAll(): Unit = {
-    UDTRegistration.register(classOf[Geometry].getName, classOf[GeometryUDT].getName)
-    UDTRegistration.register(classOf[SpatialIndex].getName, classOf[IndexUDT].getName)
-    UDTRegistration.register(classOf[CipherMat].getName, classOf[CipherMatUDT].getName)
+  def deserialize(bytes: Array[Byte]): CipherMat = {
+    fheSerde.CipherMatSerializer.deserialize(bytes)
   }
 }
