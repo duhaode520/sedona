@@ -194,8 +194,6 @@ object InferrableType {
     new InferrableType[java.util.List[java.lang.Double]] {}
   implicit val javaGeomListInstance: InferrableType[java.util.List[Geometry]] =
     new InferrableType[java.util.List[Geometry]] {}
-  implicit val fheCipherMatInstance: InferrableType[org.ade.SpatialFHE.spatialfhe.CipherMat] =
-    new InferrableType[org.ade.SpatialFHE.spatialfhe.CipherMat] {}
 }
 
 object InferredTypes {
@@ -206,6 +204,8 @@ object InferredTypes {
       expr.toGeometryArray(input)
     } else if (InferredRasterExpression.isRasterType(t)) {
       InferredRasterExpression.rasterExtractor
+    } else if (InferredCipherMatExpression.isCipherMatType(t)) {
+      InferredCipherMatExpression.cipherMatExtractor
     } else if (t =:= typeOf[Array[Double]]) { expr => input =>
       expr.eval(input).asInstanceOf[ArrayData].toDoubleArray()
     } else if (t =:= typeOf[String]) { expr => input =>
@@ -234,6 +234,8 @@ object InferredTypes {
       }
     } else if (InferredRasterExpression.isRasterType(t)) {
       InferredRasterExpression.rasterSerializer
+    } else if (InferredCipherMatExpression.isCipherMatType(t)) {
+      InferredCipherMatExpression.cipherMatSerializer
     } else if (t =:= typeOf[String]) { output =>
       if (output != null) {
         UTF8String.fromString(output.asInstanceOf[String])
@@ -283,6 +285,8 @@ object InferredTypes {
       InferredRasterExpression.rasterUDT
     } else if (InferredRasterExpression.isRasterArrayType(t)) {
       InferredRasterExpression.rasterUDTArray
+    } else if (InferredCipherMatExpression.isCipherMatType(t)) {
+      InferredCipherMatExpression.cipherMatUDT
     } else if (t =:= typeOf[java.lang.Double]) {
       DoubleType
     } else if (t =:= typeOf[java.lang.Integer]) {
