@@ -30,10 +30,11 @@ class RasterPrivateAlgebraTest extends TestBaseScala with BeforeAndAfter with Gi
   describe("Should pass all cipher operations on cipher bands") {
     it("Passed RS_Add_Private") {
       val fheHelper = FHEHelper.getInstance()
-      var inputDF = Seq(Seq(200.0, 400.0, 600.0), Seq(200.0, 500.0, 800.0))
+      var inputMat = Seq(Seq(200.0, 400.0, 600.0), Seq(200.0, 500.0, 800.0))
         .map(seq => seq.map(d => java.lang.Double.valueOf(d.toString)))
         .map(seq => JavaConverters.asJavaIterable(seq))
         .map(it => fheHelper.getManager.encryptMat(3, 1, new DoubleVector(it)))
+      var inputDF = inputMat
         .grouped(2)
         .map {
           case Seq(a, b) => (a, b)

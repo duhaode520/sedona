@@ -41,7 +41,7 @@ class CipherMatUDT extends UserDefinedType[CipherMat] {
   override def userClass: Class[CipherMat] = classOf[CipherMat]
 
   override def equals(other: Any): Boolean = other match {
-    case _: UserDefinedType[_] => other.isInstanceOf[CipherMat]
+    case _: UserDefinedType[_] => other.isInstanceOf[CipherMatUDT]
     case _ => false
   }
 
