@@ -33,9 +33,6 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 import javax.media.jai.PlanarImage;
 import javax.media.jai.RasterFactory;
-import org.ade.SpatialFHE.FHEHelper;
-import org.ade.SpatialFHE.spatialfhe.CipherMat;
-import org.ade.SpatialFHE.spatialfhe.DoubleVector;
 import org.apache.sedona.common.utils.RasterUtils;
 import org.geotools.coverage.grid.GridCoverage2D;
 
@@ -62,20 +59,6 @@ public class MapAlgebra {
     // Array to hold the band values
     double[] bandValues = new double[width * height];
     return raster.getSamples(0, 0, width, height, bandIndex - 1, bandValues);
-  }
-
-  public static CipherMat bandAsCipherMat(GridCoverage2D rasterGeom, int bandIndex) {
-    double[] bandValues = bandAsArray(rasterGeom, bandIndex);
-    if (bandValues == null) {
-      return null;
-    }
-    Raster raster = RasterUtils.getRaster(rasterGeom.getRenderedImage());
-    // Get the width and height of the raster
-    int width = raster.getWidth();
-    int height = raster.getHeight();
-
-    FHEHelper fhe = FHEHelper.getInstance();
-    return fhe.getManager().encryptMat(width, height, new DoubleVector(bandValues));
   }
 
   /**
@@ -311,14 +294,6 @@ public class MapAlgebra {
     }
 
     return result;
-  }
-
-  public static CipherMat addPrivate(CipherMat cipher_band1, CipherMat cipher_band2) {
-    FHEHelper fheHelper = FHEHelper.getInstance();
-    ensureBandShape(cipher_band1.getWidth(), cipher_band2.getWidth());
-    ensureBandShape(cipher_band1.getHeight(), cipher_band2.getHeight());
-    ensureBandShape(cipher_band1.getData().size(), cipher_band2.getData().size());
-    return fheHelper.getManager().addMat(cipher_band1, cipher_band2);
   }
 
   /**

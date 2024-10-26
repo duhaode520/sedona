@@ -21,11 +21,7 @@ package org.apache.sedona.common.raster;
 import static org.junit.Assert.*;
 
 import java.awt.image.DataBuffer;
-import java.util.List;
 import java.util.Random;
-import org.ade.SpatialFHE.FHEHelper;
-import org.ade.SpatialFHE.spatialfhe.CipherMat;
-import org.ade.SpatialFHE.spatialfhe.DoubleVector;
 import org.apache.sedona.common.utils.RasterUtils;
 import org.geotools.coverage.grid.GridCoverage2D;
 import org.junit.Assert;
@@ -205,46 +201,6 @@ public class MapAlgebraTest extends RasterTestBase {
   }
 
   @Test
-  public void testBandAsCipherMat() throws FactoryException {
-    int widthInPixel = 10;
-    int heightInPixel = 10;
-    double upperLeftX = 0;
-    double upperLeftY = 0;
-    double cellSize = 1;
-    int numbBands = 1;
-    GridCoverage2D raster =
-        RasterConstructors.makeEmptyRaster(
-            numbBands, widthInPixel, heightInPixel, upperLeftX, upperLeftY, cellSize);
-    // Out of bound index should return null
-    CipherMat cipherBand = MapAlgebra.bandAsCipherMat(raster, 0);
-    assertNull(cipherBand);
-    cipherBand = MapAlgebra.bandAsCipherMat(raster, 1);
-    assertNotNull(cipherBand);
-    FHEHelper fheHelper = FHEHelper.getInstance();
-    DoubleVector doubleVector = fheHelper.getManager().decryptMat(cipherBand);
-    double[] band = doubleVector.stream().mapToDouble(Double::doubleValue).toArray();
-
-    assertEquals(widthInPixel * heightInPixel, band.length);
-    for (double v : band) {
-      // The default value is 0.0
-      assertEquals(0.0, v, 0.1);
-    }
-    // Now set the value of the first band and check again
-    for (int i = 0; i < band.length; i++) {
-      band[i] = i * 0.1;
-    }
-    CipherMat newCipherBand =
-        MapAlgebra.bandAsCipherMat(MapAlgebra.addBandFromArray(raster, band, 1), 1);
-    assertNotNull(newCipherBand);
-    List<Double> newDoubleList = fheHelper.getManager().decryptMat(newCipherBand);
-    double[] bandNew = newDoubleList.stream().mapToDouble(Double::doubleValue).toArray();
-    assertEquals(band.length, bandNew.length);
-    for (int i = 0; i < band.length; i++) {
-      assertEquals(band[i], bandNew[i], 1e-5);
-    }
-  }
-
-  @Test
   public void testMultiplyFactor() {
     double[] input = new double[] {200, 100, 145, 255};
     double factor = 1.5;
@@ -263,20 +219,6 @@ public class MapAlgebraTest extends RasterTestBase {
     double[] band1 = new double[] {200, 100, 145, 245};
     double[] band2 = new double[] {55, 155, 110, 10};
     double[] actual = MapAlgebra.add(band1, band2);
-    double[] expected = new double[] {255.0, 255.0, 255.0, 255.0};
-    assertArrayEquals(expected, actual, 0.1d);
-  }
-
-  @Test
-  public void testAddPrivate() {
-    double[] band1 = new double[] {200, 100, 145, 245};
-    double[] band2 = new double[] {55, 155, 110, 10};
-    FHEHelper fheHelper = FHEHelper.getInstance();
-    CipherMat cipherBand1 = fheHelper.getManager().encryptMat(2, 2, new DoubleVector(band1));
-    CipherMat cipherBand2 = fheHelper.getManager().encryptMat(2, 2, new DoubleVector(band2));
-    CipherMat cipherActual = MapAlgebra.addPrivate(cipherBand1, cipherBand2);
-    List<Double> actualList = fheHelper.getManager().decryptMat(cipherActual);
-    double[] actual = actualList.stream().mapToDouble(Double::doubleValue).toArray();
     double[] expected = new double[] {255.0, 255.0, 255.0, 255.0};
     assertArrayEquals(expected, actual, 0.1d);
   }

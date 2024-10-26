@@ -30,11 +30,10 @@ class RasterPrivateAlgebraTest extends TestBaseScala with BeforeAndAfter with Gi
   describe("Should pass all cipher operations on cipher bands") {
     it("Passed RS_Add_Private") {
       val fheHelper = FHEHelper.getInstance()
-      var inputMat = Seq(Seq(200.0, 400.0, 600.0), Seq(200.0, 500.0, 800.0))
+      var inputDF = Seq(Seq(200.0, 400.0, 600.0), Seq(200.0, 500.0, 800.0))
         .map(seq => seq.map(d => java.lang.Double.valueOf(d.toString)))
         .map(seq => JavaConverters.asJavaIterable(seq))
         .map(it => fheHelper.getManager.encryptMat(3, 1, new DoubleVector(it)))
-      var inputDF = inputMat
         .grouped(2)
         .map {
           case Seq(a, b) => (a, b)
@@ -54,6 +53,62 @@ class RasterPrivateAlgebraTest extends TestBaseScala with BeforeAndAfter with Gi
       // expected and actual are approximately equal
       actual.zip(expected).foreach { case (a, b) =>
         assert(Math.abs(a - b) < 1e-5)
+      }
+    }
+
+    it("Passed RS_Subtract_Private") {
+      val fheHelper = FHEHelper.getInstance()
+      var inputDF = Seq(Seq(200.0, 400.0, 600.0), Seq(200.0, 500.0, 800.0))
+        .map(seq => seq.map(d => java.lang.Double.valueOf(d.toString)))
+        .map(seq => JavaConverters.asJavaIterable(seq))
+        .map(it => fheHelper.getManager.encryptMat(3, 1, new DoubleVector(it)))
+        .grouped(2)
+        .map {
+          case Seq(a, b) => (a, b)
+          case Seq(a) => (a, null)
+        }
+        .toSeq
+        .toDF("Band1", "Band2")
+
+      val expected = Seq(0.0, -100.0, -200.0)
+      inputDF = inputDF.selectExpr("RS_Subtract_Private(Band1, Band2) as sumOfBands")
+      val actual = inputDF
+        .first()
+        .toSeq
+        .asInstanceOf[Seq[CipherMat]]
+        .map(fheHelper.getManager.decryptMat(_))
+        .flatMap(JavaConverters.asScalaBuffer(_).toSeq)
+      // expected and actual are approximately equal
+      actual.zip(expected).foreach { case (a, b) =>
+        assert(Math.abs(a - b) < 1e-5)
+      }
+    }
+
+    it("Passed RS_Multiply") {
+      val fheHelper = FHEHelper.getInstance()
+      var inputDF = Seq(Seq(200.0, 400.0, 600.0), Seq(200.0, 500.0, 800.0))
+        .map(seq => seq.map(d => java.lang.Double.valueOf(d.toString)))
+        .map(seq => JavaConverters.asJavaIterable(seq))
+        .map(it => fheHelper.getManager.encryptMat(3, 1, new DoubleVector(it)))
+        .grouped(2)
+        .map {
+          case Seq(a, b) => (a, b)
+          case Seq(a) => (a, null)
+        }
+        .toSeq
+        .toDF("Band1", "Band2")
+
+      val expected = Seq(40000.0, 200000.0, 480000.0)
+      inputDF = inputDF.selectExpr("RS_Multiply_Private(Band1, Band2) as sumOfBands")
+      val actual = inputDF
+        .first()
+        .toSeq
+        .asInstanceOf[Seq[CipherMat]]
+        .map(fheHelper.getManager.decryptMat(_))
+        .flatMap(JavaConverters.asScalaBuffer(_).toSeq)
+      // expected and actual are approximately equal
+      actual.zip(expected).foreach { case (a, b) =>
+        assert(Math.abs(a - b) < 1e-3)
       }
     }
 

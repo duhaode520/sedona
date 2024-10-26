@@ -24,7 +24,6 @@ import org.apache.spark.sql.catalyst.expressions.Expression
 import org.apache.spark.sql.catalyst.util.{ArrayData, GenericArrayData}
 import org.apache.spark.sql.sedona_sql.expressions.InferrableFunctionConverter._
 import org.apache.spark.sql.sedona_sql.expressions.InferrableRasterTypes._
-import org.apache.spark.sql.sedona_sql.expressions.InferrableCipherMatTypes._
 import org.apache.spark.sql.sedona_sql.expressions.InferredExpression
 
 /// Calculate Normalized Difference between two bands
@@ -118,13 +117,6 @@ case class RS_MultiplyFactor(inputExpressions: Seq[Expression])
 // Add two bands
 case class RS_Add(inputExpressions: Seq[Expression])
     extends InferredExpression(MapAlgebra.add _) {
-  protected def withNewChildrenInternal(newChildren: IndexedSeq[Expression]) = {
-    copy(inputExpressions = newChildren)
-  }
-}
-
-case class RS_Add_Private(inputExpressions: Seq[Expression])
-    extends InferredExpression(MapAlgebra.addPrivate _) {
   protected def withNewChildrenInternal(newChildren: IndexedSeq[Expression]) = {
     copy(inputExpressions = newChildren)
   }
@@ -224,14 +216,6 @@ case class RS_BandAsArray(inputExpressions: Seq[Expression])
   protected def withNewChildrenInternal(newChildren: IndexedSeq[Expression]) = {
     copy(inputExpressions = newChildren)
   }
-}
-
-case class RS_BandAsCipherMat(inputExpressions: Seq[Expression])
-    extends InferredExpression(MapAlgebra.bandAsCipherMat _) {
-  protected def withNewChildrenInternal(newChildren: IndexedSeq[Expression]) = {
-    copy(inputExpressions = newChildren)
-  }
-
 }
 
 case class RS_MapAlgebra(inputExpressions: Seq[Expression])

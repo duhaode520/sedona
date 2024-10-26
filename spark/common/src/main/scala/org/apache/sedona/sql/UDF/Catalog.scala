@@ -25,6 +25,7 @@ import org.apache.spark.sql.expressions.Aggregator
 import org.apache.spark.sql.sedona_sql.expressions._
 import org.apache.spark.sql.sedona_sql.expressions.collect.ST_Collect
 import org.apache.spark.sql.sedona_sql.expressions.raster._
+import org.apache.spark.sql.sedona_sql.expressions.fhe._
 import org.locationtech.jts.geom.Geometry
 import org.locationtech.jts.operation.buffer.BufferParameters
 
@@ -243,7 +244,6 @@ object Catalog {
     function[RS_LessThan](),
     function[RS_LessThanEqual](),
     function[RS_Add](),
-    function[RS_Add_Private](),
     function[RS_Subtract](),
     function[RS_Divide](),
     function[RS_MultiplyFactor](),
@@ -260,7 +260,6 @@ object Catalog {
     function[RS_NormalizeAll](),
     function[RS_AddBandFromArray](),
     function[RS_BandAsArray](),
-    function[RS_BandAsCipherMat](),
     function[RS_MapAlgebra](null),
     function[RS_FromArcInfoAsciiGrid](),
     function[RS_FromGeoTiff](),
@@ -332,7 +331,14 @@ object Catalog {
     function[RS_Resample](),
     function[RS_ReprojectMatch]("nearestneighbor"),
     function[RS_FromNetCDF](),
-    function[RS_NetCDFInfo]())
+    function[RS_NetCDFInfo](),
+    // function for FHE Raster
+    function[RS_Add_Private](),
+    function[RS_Add_PrivatePlain](),
+    function[RS_Subtract_Private](),
+    function[RS_Multiply_Private](),
+    function[RS_Multiply_PrivatePlain](),
+    function[RS_BandAsCipherMat]())
 
   // Aggregate functions with Geometry as buffer
   val aggregateExpressions: Seq[Aggregator[Geometry, Geometry, Geometry]] =
