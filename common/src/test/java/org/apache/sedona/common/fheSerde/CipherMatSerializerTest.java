@@ -23,6 +23,7 @@ import static org.junit.Assert.assertEquals;
 import org.ade.SpatialFHE.FHEHelper;
 import org.ade.SpatialFHE.spatialfhe.CipherMat;
 import org.ade.SpatialFHE.spatialfhe.DoubleVector;
+import org.ade.SpatialFHE.spatialfhe.HECrypto;
 import org.junit.Test;
 
 public class CipherMatSerializerTest {
@@ -48,7 +49,9 @@ public class CipherMatSerializerTest {
             resourceFolder + "tmp/private.key",
             fhelibPath,
             fheJsonConfig,
-            true);
+            HECrypto.HELibrary.SEAL,
+            true,
+            2);
     DoubleVector dv = new DoubleVector(new double[] {1, 2, 3, 4, 5, 6});
     CipherMat cipherMat = fheHelper.getManager().encryptMat(3, 2, dv);
     byte[] bytes = CipherMatSerializer.serialize(cipherMat);

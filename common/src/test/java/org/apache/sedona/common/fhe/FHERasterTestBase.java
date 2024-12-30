@@ -20,6 +20,7 @@ package org.apache.sedona.common.fhe;
 
 import java.io.IOException;
 import org.ade.SpatialFHE.FHEHelper;
+import org.ade.SpatialFHE.spatialfhe.HECrypto;
 import org.apache.sedona.common.raster.RasterTestBase;
 import org.junit.Before;
 
@@ -45,6 +46,8 @@ public class FHERasterTestBase extends RasterTestBase {
         resourceFolder + "tmp/private.key",
         fhelibPath,
         fheJsonConfig,
-        true);
+        HECrypto.HELibrary.Phantom,
+        true,
+        2);
   }
 }
