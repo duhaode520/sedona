@@ -18,6 +18,7 @@
  */
 package org.apache.spark.sql.sedona_sql.expressions
 
+import org.ade.SpatialFHE.spatialfhe.{TFHEBool, TFHEGeometry, TFHEInt32}
 import org.apache.commons.lang3.StringUtils
 import org.apache.spark.sql.catalyst.InternalRow
 import org.apache.spark.sql.catalyst.expressions.{Expression, ImplicitCastInputTypes}
@@ -194,6 +195,13 @@ object InferrableType {
     new InferrableType[java.util.List[java.lang.Double]] {}
   implicit val javaGeomListInstance: InferrableType[java.util.List[Geometry]] =
     new InferrableType[java.util.List[Geometry]] {}
+  // TFHE
+  implicit val tfheGeometryInstance: InferrableType[TFHEGeometry] =
+    new InferrableType[TFHEGeometry] {}
+  implicit val tfheBoolInstance: InferrableType[TFHEBool] =
+    new InferrableType[TFHEBool] {}
+  implicit val tfheInt32Instance: InferrableType[TFHEInt32] =
+    new InferrableType[TFHEInt32] {}
 }
 
 object InferredTypes {

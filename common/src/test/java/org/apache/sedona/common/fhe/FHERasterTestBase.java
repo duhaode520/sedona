@@ -46,6 +46,7 @@ public class FHERasterTestBase extends RasterTestBase {
         resourceFolder + "tmp/private.key",
         fhelibPath,
         fheJsonConfig,
+        "127.0.0.1:8080",
         HECrypto.HELibrary.Phantom,
         true,
         2);
