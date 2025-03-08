@@ -235,6 +235,7 @@ object Catalog {
     function[ST_Rotate](),
     function[ST_RotateX](),
     // Expression for TFHE Geometry
+    function[FHE_Decrypt_Bool](),
     function[ST_Contains_Private](),
     function[ST_Intersects_Private](),
     function[ST_Covers_Private](),
@@ -247,6 +248,9 @@ object Catalog {
     function[ST_Disjoint_Private](),
     function[ST_Relate_Private](),
     function[ST_RelateMatch_Private](),
+    function[ST_Point_Private](),
+    function[ST_GeomFromWKT_Private](),
+    function[ST_PolygonFromEnvelope_Private](),
     // Expression for rasters
     function[RS_NormalizedDifference](),
     function[RS_Mean](),

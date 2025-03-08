@@ -24,7 +24,7 @@ import org.apache.spark.sql.catalyst.InternalRow
 import org.apache.spark.sql.catalyst.expressions.{Expression, ImplicitCastInputTypes}
 import org.apache.spark.sql.catalyst.expressions.codegen.CodegenFallback
 import org.apache.spark.sql.catalyst.util.ArrayData
-import org.apache.spark.sql.sedona_sql.UDT.GeometryUDT
+import org.apache.spark.sql.sedona_sql.UDT.{CipherGeometryUDT, GeometryUDT, TFHEBoolUDT}
 import org.apache.spark.sql.types.{AbstractDataType, BinaryType, BooleanType, DataType, DataTypes, DoubleType, IntegerType, LongType, StringType}
 import org.apache.spark.unsafe.types.UTF8String
 import org.locationtech.jts.geom.Geometry
@@ -240,6 +240,18 @@ object InferredTypes {
       } else {
         null
       }
+    } else if (t =:= typeOf[TFHEGeometry]) { output =>
+      if (output != null) {
+        output.asInstanceOf[TFHEGeometry].toGenericArrayData
+      } else {
+        null
+      }
+    } else if (t =:= typeOf[TFHEBool]) { output =>
+      if (output != null) {
+        output.asInstanceOf[TFHEBool].toGenericArrayData
+      } else {
+        null
+      }
     } else if (InferredRasterExpression.isRasterType(t)) {
       InferredRasterExpression.rasterSerializer
     } else if (InferredCipherMatExpression.isCipherMatType(t)) {
@@ -295,6 +307,10 @@ object InferredTypes {
       InferredRasterExpression.rasterUDTArray
     } else if (InferredCipherMatExpression.isCipherMatType(t)) {
       InferredCipherMatExpression.cipherMatUDT
+    } else if (t =:= typeOf[TFHEGeometry]) {
+      CipherGeometryUDT
+    } else if (t =:= typeOf[TFHEBool]) {
+      TFHEBoolUDT
     } else if (t =:= typeOf[java.lang.Double]) {
       DoubleType
     } else if (t =:= typeOf[java.lang.Integer]) {

@@ -16,20 +16,12 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.spark.sql.sedona_sql.UDT
+package org.apache.sedona.common.fhe;
 
-import org.ade.SpatialFHE.spatialfhe.{CipherMat, TFHEGeometry, TFHEBool}
-import org.apache.spark.sql.types.UDTRegistration
-import org.locationtech.jts.geom.Geometry
-import org.locationtech.jts.index.SpatialIndex
+import org.ade.SpatialFHE.spatialfhe.TFHEBool;
 
-object UdtRegistratorWrapper {
-
-  def registerAll(): Unit = {
-    UDTRegistration.register(classOf[Geometry].getName, classOf[GeometryUDT].getName)
-    UDTRegistration.register(classOf[SpatialIndex].getName, classOf[IndexUDT].getName)
-    UDTRegistration.register(classOf[CipherMat].getName, classOf[CipherMatUDT].getName)
-    UDTRegistration.register(classOf[TFHEGeometry].getName, classOf[CipherGeometryUDT].getName)
-    UDTRegistration.register(classOf[TFHEBool].getName, classOf[TFHEBoolUDT].getName)
+public class FHEDecrypt {
+  public static boolean decrypt_bool(TFHEBool input) {
+    return input.decrypt();
   }
 }

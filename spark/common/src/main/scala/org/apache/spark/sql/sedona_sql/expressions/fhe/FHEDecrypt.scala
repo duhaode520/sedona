@@ -16,20 +16,18 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.spark.sql.sedona_sql.UDT
+package org.apache.spark.sql.sedona_sql.expressions.fhe
 
-import org.ade.SpatialFHE.spatialfhe.{CipherMat, TFHEGeometry, TFHEBool}
-import org.apache.spark.sql.types.UDTRegistration
-import org.locationtech.jts.geom.Geometry
-import org.locationtech.jts.index.SpatialIndex
+import org.apache.spark.sql.catalyst.expressions.Expression
+import org.apache.spark.sql.sedona_sql.expressions.{InferredExpression, UserDataGeneratator}
+import org.apache.spark.sql.sedona_sql.expressions.InferrableFunctionConverter._
+import org.apache.sedona.common.fhe.FHEDecrypt
 
-object UdtRegistratorWrapper {
+case class FHE_Decrypt_Bool(inputExpressions: Seq[Expression])
+    extends InferredExpression(FHEDecrypt.decrypt_bool _) {
 
-  def registerAll(): Unit = {
-    UDTRegistration.register(classOf[Geometry].getName, classOf[GeometryUDT].getName)
-    UDTRegistration.register(classOf[SpatialIndex].getName, classOf[IndexUDT].getName)
-    UDTRegistration.register(classOf[CipherMat].getName, classOf[CipherMatUDT].getName)
-    UDTRegistration.register(classOf[TFHEGeometry].getName, classOf[CipherGeometryUDT].getName)
-    UDTRegistration.register(classOf[TFHEBool].getName, classOf[TFHEBoolUDT].getName)
+  protected def withNewChildrenInternal(newChildren: IndexedSeq[Expression]) = {
+    copy(inputExpressions = newChildren)
   }
+
 }

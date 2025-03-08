@@ -22,7 +22,7 @@ import org.apache.sedona.sql.utils.CipherGeometrySerializer
 import org.apache.spark.sql.catalyst.InternalRow
 import org.apache.spark.sql.catalyst.expressions.codegen.CodegenFallback
 import org.apache.spark.sql.catalyst.expressions.{ExpectsInputTypes, Expression, NullIntolerant}
-import org.apache.spark.sql.sedona_sql.UDT.CipherGeometryUDT
+import org.apache.spark.sql.sedona_sql.UDT.{CipherGeometryUDT, TFHEBoolUDT}
 import org.apache.spark.sql.types.{AbstractDataType, BooleanType, DataType}
 import org.apache.spark.sql.sedona_sql.expressions.InferrableFunctionConverter._
 import org.apache.spark.sql.sedona_sql.expressions._
@@ -43,7 +43,7 @@ abstract class ST_Predicate_Private
 
   override def inputTypes: Seq[AbstractDataType] = Seq(CipherGeometryUDT, CipherGeometryUDT)
 
-  override def dataType: DataType = BooleanType
+  override def dataType: DataType = TFHEBoolUDT
 
   override def children: Seq[Expression] = inputExpressions
 

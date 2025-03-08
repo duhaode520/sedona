@@ -31,11 +31,13 @@ public class CipherGeometrySerializer {
   public static byte[] serialize(TFHEGeometry geometry) {
     try {
       CipherGeometryOutputStream outputStream;
-      if (geometry instanceof TFHEPoint) {
+      TFHEGeometryTypeId type = geometry.getGeometryTypeId();
+      if (type == TFHEGeometryTypeId.TFHE_POINT) {
         outputStream = serializePoint(geometry.asPoint());
-      } else if (geometry instanceof TFHELineString) {
+      } else if (type == TFHEGeometryTypeId.TFHE_LINESTRING
+          || type == TFHEGeometryTypeId.TFHE_LINEARRING) {
         outputStream = serializeLineString(geometry.asLineString());
-      } else if (geometry instanceof TFHEPolygon) {
+      } else if (type == TFHEGeometryTypeId.TFHE_POLYGON) {
         outputStream = serializePolygon(geometry.asPolygon());
       } else {
         throw new UnsupportedOperationException(
@@ -54,7 +56,6 @@ public class CipherGeometrySerializer {
   public static TFHEGeometry deserialize(
       CipherGeometryInputStream inputStream, TFHEGeometryFactory factory) {
     try {
-      checkBufferSize(inputStream, 8);
       int preambleByte = inputStream.getByte(0) & 0xFF;
       int wkbType = preambleByte >> 4;
       boolean hasSrid = (preambleByte & 0x01) != 0;
@@ -100,18 +101,18 @@ public class CipherGeometrySerializer {
 
   private static TFHEPoint deserializePoint(
       CipherGeometryInputStream inputStream, TFHEGeometryFactory factory) throws IOException {
-    int numCoordinates = getBoundedInt(inputStream, 4);
+    int numCoordinates = inputStream.readInt();
     TFHEPoint point;
 
     if (numCoordinates == 0) {
       point = factory.createPoint();
-      inputStream.mark(8);
+      inputStream.mark(5);
     } else {
-      TFHECoordinateSequence coordinates = inputStream.getCoordinate(8);
+      TFHECoordinateSequence coordinates = inputStream.readCoordinate();
       point = factory.createPoint(coordinates);
       // Mark the end of the point data
       int coordinateSize = inputStream.getMark();
-      inputStream.mark(8 + coordinateSize);
+      inputStream.mark(5 + coordinateSize);
     }
 
     return point;
@@ -134,15 +135,15 @@ public class CipherGeometrySerializer {
 
   private static TFHELineString deserializeLineString(
       CipherGeometryInputStream inputStream, TFHEGeometryFactory factory) throws IOException {
-    int numCoordinates = getBoundedInt(inputStream, 4);
+    int numCoordinates = inputStream.readInt();
 
     if (numCoordinates > 0) {
-      TFHECoordinateSequence coordinates = inputStream.getCoordinates(8, numCoordinates);
+      TFHECoordinateSequence coordinates = inputStream.readCoordinates(numCoordinates);
       // Mark where we finished reading
-      inputStream.mark(8 + inputStream.getMark());
+      //      inputStream.mark(8 + inputStream.getMark());
       return factory.createLineString(coordinates);
     } else {
-      inputStream.mark(8);
+      //      inputStream.mark(8);
       return factory.createLineString();
     }
   }
@@ -150,28 +151,32 @@ public class CipherGeometrySerializer {
   private static CipherGeometryOutputStream serializePolygon(TFHEPolygon polygon)
       throws IOException {
     TFHELinearRing exteriorRing = polygon.getExteriorRing();
-    int numCoordinates = (int) polygon.getNumPoints();
     int numInteriorRings = (int) polygon.getNumInteriorRing();
+    int numCoordinates = (int) polygon.getNumPoints();
 
     CipherGeometryOutputStream outputStream =
         createOutputStream(WKBType.wkbPolygon, numCoordinates);
 
     if (exteriorRing != null && !exteriorRing.isEmpty()) {
-      // Serialize all coordinates
-      TFHECoordinateSequence coordinates = exteriorRing.getCoordinatesRO();
-      outputStream.putCoordinates(coordinates);
-
       // Write number of rings
       outputStream.putInt(numInteriorRings + 1);
 
       // Write exterior ring point count
       outputStream.putInt((int) exteriorRing.getNumPoints());
 
+      // Serialize all coordinates
+      TFHECoordinateSequence coordinates = exteriorRing.getCoordinatesRO();
+      outputStream.putCoordinates(coordinates);
+
       // Write interior rings
       for (int i = 0; i < numInteriorRings; i++) {
         TFHELinearRing innerRing = polygon.getInteriorRingN(i);
         outputStream.putInt((int) innerRing.getNumPoints());
+        outputStream.putCoordinates(innerRing.getCoordinatesRO());
       }
+    } else {
+      outputStream.putInt(0);
+      outputStream.putInt(0);
     }
 
     return outputStream;
@@ -179,60 +184,40 @@ public class CipherGeometrySerializer {
 
   private static TFHEPolygon deserializePolygon(
       CipherGeometryInputStream inputStream, TFHEGeometryFactory factory) throws IOException {
-    int numCoordinates = getBoundedInt(inputStream, 4);
-
-    if (numCoordinates == 0) {
-      inputStream.mark(8);
+    int totalCoordinatesNum = inputStream.readInt();
+    if (totalCoordinatesNum == 0) {
+      return factory.createPolygon();
+    }
+    int numRings = inputStream.readInt();
+    if (numRings == 0) {
       return factory.createPolygon();
     }
 
-    TFHECoordinateSequence coordinates = inputStream.getCoordinates(8, numCoordinates);
-    int coordsEndPosition = 8 + inputStream.getMark();
-
-    // Read number of rings
-    int numRings = inputStream.getInt(coordsEndPosition);
-    int ringDataPos = coordsEndPosition + 4;
-
-    if (numRings <= 0) {
-      inputStream.mark(ringDataPos);
+    int exteriorRingPoints = inputStream.readInt();
+    if (exteriorRingPoints == 0) {
       return factory.createPolygon();
     }
 
     // Read exterior ring point count
-    int exteriorRingPoints = inputStream.getInt(ringDataPos);
-    ringDataPos += 4;
+    TFHECoordinateSequence coordinates = inputStream.readCoordinates(exteriorRingPoints);
 
     // Create exterior ring
-    TFHELinearRing shell = createRing(coordinates, 0, exteriorRingPoints, factory);
+    TFHELinearRing shell = factory.createLinearRing(coordinates);
 
     // Read interior rings if any
     TFHELinearRing[] holes = new TFHELinearRing[numRings - 1];
     int coordIndex = exteriorRingPoints;
 
     for (int i = 0; i < numRings - 1; i++) {
-      int interiorRingPoints = inputStream.getInt(ringDataPos);
-      ringDataPos += 4;
-      holes[i] = createRing(coordinates, coordIndex, interiorRingPoints, factory);
+      int interiorRingPoints = inputStream.readInt();
+      TFHECoordinateSequence interiorCoordinates = inputStream.readCoordinates(interiorRingPoints);
+      holes[i] = factory.createLinearRing(interiorCoordinates);
       coordIndex += interiorRingPoints;
     }
 
     // Mark the position after all polygon data
-    inputStream.mark(ringDataPos);
 
     return factory.createPolygon(shell, new LinearRingVector(holes));
-  }
-
-  private static TFHELinearRing createRing(
-      TFHECoordinateSequence allCoords,
-      int startIndex,
-      int numPoints,
-      TFHEGeometryFactory factory) {
-    // Extract the coordinates for this ring
-    CoordinateVector ringCoords = new CoordinateVector();
-    for (int i = 0; i < numPoints; i++) {
-      ringCoords.add(allCoords.getAt(startIndex + i));
-    }
-    return factory.createLinearRing(new TFHECoordinateSequence(ringCoords));
   }
 
   private static CipherGeometryOutputStream createOutputStream(int wkbType, int numCoordinates)
@@ -245,12 +230,6 @@ public class CipherGeometrySerializer {
 
     outputStream.putInt(numCoordinates);
     return outputStream;
-  }
-
-  private static void checkBufferSize(CipherGeometryInputStream inputStream, int minimumSize) {
-    if (inputStream.getLength() < minimumSize) {
-      throw new IllegalArgumentException("Buffer to be deserialized is incomplete");
-    }
   }
 
   private static int getBoundedInt(CipherGeometryInputStream inputStream, int offset)

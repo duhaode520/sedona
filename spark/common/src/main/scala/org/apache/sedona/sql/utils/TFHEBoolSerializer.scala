@@ -18,16 +18,38 @@
  */
 package org.apache.sedona.sql.utils
 
-import org.ade.SpatialFHE.spatialfhe.TFHEGeometry
-import org.apache.sedona.common.{fheSerde, geometrySerde}
-import org.apache.sedona.common.geometrySerde.CipherGeometrySerializer
+import org.ade.SpatialFHE.spatialfhe.TFHEBool
+import org.apache.sedona.common.fheSerde.{TFHEBoolSerializer => JavaSerializer}
 
-object CipherGeometrySerializer {
-  def serialize(geometry: TFHEGeometry): Array[Byte] = {
-    geometrySerde.CipherGeometrySerializer.serialize(geometry)
+object TFHEBoolSerializer {
+
+  /**
+   * Serialize TFHEBool object to byte array
+   * @param tfheBool
+   *   the TFHEBool object
+   * @return
+   *   serialized byte array
+   */
+  def serialize(tfheBool: TFHEBool): Array[Byte] = {
+    if (tfheBool == null) {
+      Array.empty[Byte]
+    } else {
+      JavaSerializer.serialize(tfheBool)
+    }
   }
 
-  def deserialize(value: Array[Byte]): TFHEGeometry = {
-    geometrySerde.CipherGeometrySerializer.deserialize(value)
+  /**
+   * Deserialize byte array to TFHEBool object
+   * @param bytes
+   *   serialized TFHEBool
+   * @return
+   *   TFHEBool object
+   */
+  def deserialize(bytes: Array[Byte]): TFHEBool = {
+    if (bytes == null || bytes.isEmpty) {
+      new TFHEBool() // 返回一个默认的空对象
+    } else {
+      JavaSerializer.deserialize(bytes)
+    }
   }
 }

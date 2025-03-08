@@ -49,30 +49,45 @@ public class CipherGeometryInputStream {
   public byte getByte(int offset) throws IOException {
     byteArrayInputStream.reset();
     byteArrayInputStream.skip(offset);
+    return readByte();
+  }
+
+  public byte readByte() throws IOException {
     return (byte) byteArrayInputStream.read();
   }
 
   public void getBytes(byte[] bytes, int offset, int length) throws IOException {
     byteArrayInputStream.reset();
     byteArrayInputStream.skip(offset);
+    readBytes(bytes, length);
+  }
+
+  public void readBytes(byte[] bytes, int length) throws IOException {
     dataInputStream.readFully(bytes, 0, length);
   }
 
   public int getInt(int offset) throws IOException {
     byteArrayInputStream.reset();
     byteArrayInputStream.skip(offset);
+    return readInt();
+  }
+
+  public int readInt() throws IOException {
     return dataInputStream.readInt();
   }
 
   public TFHECoordinateSequence getCoordinate(int offset) throws IOException {
     byteArrayInputStream.reset();
     byteArrayInputStream.skip(offset);
+    return readCoordinate();
+  }
 
-    int serXSize = dataInputStream.readInt();
-    int serYSize = dataInputStream.readInt();
+  public TFHECoordinateSequence readCoordinate() throws IOException {
+    int serXSize = readInt();
+    int serYSize = readInt();
 
     byte[] data = new byte[serXSize + serYSize];
-    dataInputStream.readFully(data, 0, serXSize + serYSize);
+    readBytes(data, serXSize + serYSize);
 
     ByteVector serX = new ByteVector();
     ByteVector serY = new ByteVector();
@@ -86,21 +101,28 @@ public class CipherGeometryInputStream {
 
     CoordinateVector coordinates = new CoordinateVector();
     coordinates.add(new TFHECoordinate(TFHEInt32.deserialize(serX), TFHEInt32.deserialize(serY)));
-    return new TFHECoordinateSequence(coordinates);
+    TFHECoordinateSequence coordinateSequence = new TFHECoordinateSequence(coordinates.size());
+    for (int i = 0; i < coordinates.size(); i++) {
+      coordinateSequence.setAt(coordinates.get(i), i);
+    }
+    return coordinateSequence;
   }
 
   public TFHECoordinateSequence getCoordinates(int offset, int numCoordinates) throws IOException {
     byteArrayInputStream.reset();
     byteArrayInputStream.skip(offset);
+    return readCoordinates(numCoordinates);
+  }
 
+  public TFHECoordinateSequence readCoordinates(int numCoordinates) throws IOException {
     CoordinateVector coordinates = new CoordinateVector();
 
     for (int k = 0; k < numCoordinates; k++) {
-      int serXSize = dataInputStream.readInt();
-      int serYSize = dataInputStream.readInt();
+      int serXSize = readInt();
+      int serYSize = readInt();
 
       byte[] data = new byte[serXSize + serYSize];
-      dataInputStream.readFully(data, 0, serXSize + serYSize);
+      readBytes(data, serXSize + serYSize);
 
       ByteVector serX = new ByteVector();
       ByteVector serY = new ByteVector();
@@ -115,16 +137,22 @@ public class CipherGeometryInputStream {
       coordinates.add(new TFHECoordinate(TFHEInt32.deserialize(serX), TFHEInt32.deserialize(serY)));
     }
 
-    return new TFHECoordinateSequence(coordinates);
+    TFHECoordinateSequence coordinateSequence = new TFHECoordinateSequence(coordinates.size());
+    for (int i = 0; i < coordinates.size(); i++) {
+      coordinateSequence.setAt(coordinates.get(i), i);
+    }
+    return coordinateSequence;
   }
 
   public CipherGeometryInputStream slice(int offset) throws IOException {
     byteArrayInputStream.reset();
     byteArrayInputStream.skip(offset);
+    return readSlice();
+  }
 
+  public CipherGeometryInputStream readSlice() throws IOException {
     byte[] remaining = new byte[byteArrayInputStream.available()];
-    dataInputStream.readFully(remaining);
-
+    readBytes(remaining, remaining.length);
     return new CipherGeometryInputStream(remaining);
   }
 }

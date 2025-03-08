@@ -18,7 +18,8 @@
  */
 package org.apache.spark.sql.sedona_sql.expressions
 
-import org.apache.sedona.sql.utils.GeometrySerializer
+import org.ade.SpatialFHE.spatialfhe.{TFHEGeometry, TFHEBool}
+import org.apache.sedona.sql.utils.{CipherGeometrySerializer, GeometrySerializer, TFHEBoolSerializer}
 import org.apache.spark.sql.catalyst.InternalRow
 import org.apache.spark.sql.catalyst.expressions.Expression
 import org.apache.spark.sql.catalyst.util.ArrayData
@@ -140,5 +141,13 @@ object implicits {
       geom.getCoordinates.map(coordinate => geometryFactory.createPoint(coordinate))
 
     def isNonEmpty: Boolean = geom != null && !geom.isEmpty
+  }
+
+  implicit class CipherGeometryEnchancer(geom: TFHEGeometry) {
+    def toGenericArrayData: Array[Byte] = CipherGeometrySerializer.serialize(geom)
+  }
+
+  implicit class TFHEBoolEnhancer(tfheBool: TFHEBool) {
+    def toGenericArrayData: Array[Byte] = TFHEBoolSerializer.serialize(tfheBool)
   }
 }

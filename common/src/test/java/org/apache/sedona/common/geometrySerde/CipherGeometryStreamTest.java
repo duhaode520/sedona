@@ -22,9 +22,6 @@ import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
 
 import java.io.IOException;
-
-import org.ade.SpatialFHE.FHEHelper;
-import org.ade.SpatialFHE.LibLoader;
 import org.ade.SpatialFHE.spatialfhe.*;
 import org.apache.sedona.common.fhe.FHEVectorTestBase;
 import org.junit.Before;
