@@ -19,8 +19,13 @@
 package org.apache.sedona.core.serde;
 
 import com.esotericsoftware.kryo.Kryo;
+import org.ade.SpatialFHE.spatialfhe.TFHEBool;
+import org.ade.SpatialFHE.spatialfhe.TFHELineString;
+import org.ade.SpatialFHE.spatialfhe.TFHEPoint;
+import org.ade.SpatialFHE.spatialfhe.TFHEPolygon;
 import org.apache.log4j.Logger;
 import org.apache.sedona.common.geometryObjects.Circle;
+import org.apache.sedona.common.geometrySerde.CipherGeometrySerde;
 import org.apache.sedona.common.geometrySerde.GeometrySerde;
 import org.apache.sedona.common.geometrySerde.SpatialIndexSerde;
 import org.apache.spark.serializer.KryoRegistrator;
@@ -43,6 +48,7 @@ public class SedonaKryoRegistrator implements KryoRegistrator {
   public void registerClasses(Kryo kryo) {
     GeometrySerde serializer = new GeometrySerde();
     SpatialIndexSerde indexSerializer = new SpatialIndexSerde(serializer);
+    CipherGeometrySerde cipherSerializer = new CipherGeometrySerde();
 
     log.info("Registering custom serializers for geometry types");
 
@@ -58,5 +64,9 @@ public class SedonaKryoRegistrator implements KryoRegistrator {
     // TODO: Replace the default serializer with default spatial index serializer
     kryo.register(Quadtree.class, indexSerializer);
     kryo.register(STRtree.class, indexSerializer);
+    kryo.register(TFHEPoint.class, cipherSerializer);
+    kryo.register(TFHELineString.class, cipherSerializer);
+    kryo.register(TFHEPolygon.class, cipherSerializer);
+    kryo.register(TFHEBool.class, cipherSerializer);
   }
 }

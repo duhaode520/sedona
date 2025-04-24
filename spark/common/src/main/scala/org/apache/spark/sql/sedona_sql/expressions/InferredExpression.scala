@@ -210,6 +210,10 @@ object InferredTypes {
       expr.toGeometry(input)
     } else if (t =:= typeOf[Array[Geometry]]) { expr => input =>
       expr.toGeometryArray(input)
+    } else if (t =:= typeOf[TFHEGeometry]) { expr => input =>
+      expr.toTFHEGeometry(input)
+//    } else if (t =:= typeOf[TFHEBool]) { expr => input =>
+//      expr.toTFHEBool(input)
     } else if (InferredRasterExpression.isRasterType(t)) {
       InferredRasterExpression.rasterExtractor
     } else if (InferredCipherMatExpression.isCipherMatType(t)) {

@@ -43,6 +43,34 @@ object implicits {
       }
     }
 
+    def toTFHEGeometry(input: InternalRow): TFHEGeometry = {
+      if (inputExpression.isInstanceOf[SerdeAware]) {
+        inputExpression
+          .asInstanceOf[SerdeAware]
+          .evalWithoutSerialization(input)
+          .asInstanceOf[TFHEGeometry]
+      } else {
+        inputExpression.eval(input).asInstanceOf[Array[Byte]] match {
+          case binary: Array[Byte] => CipherGeometrySerializer.deserialize(binary)
+          case _ => null
+        }
+      }
+    }
+
+    def toTFHEBool(input: InternalRow): TFHEBool = {
+      if (inputExpression.isInstanceOf[SerdeAware]) {
+        inputExpression
+          .asInstanceOf[SerdeAware]
+          .evalWithoutSerialization(input)
+          .asInstanceOf[TFHEBool]
+      } else {
+        inputExpression.eval(input).asInstanceOf[Array[Byte]] match {
+          case binary: Array[Byte] => TFHEBoolSerializer.deserialize(binary)
+          case _ => null
+        }
+      }
+    }
+
     def toGeometryArray(input: InternalRow): Array[Geometry] = {
       inputExpression match {
         case aware: SerdeAware =>

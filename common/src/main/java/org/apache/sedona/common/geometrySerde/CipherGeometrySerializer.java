@@ -120,7 +120,7 @@ public class CipherGeometrySerializer {
 
   private static CipherGeometryOutputStream serializeLineString(TFHELineString lineString)
       throws IOException {
-    TFHECoordinateSequence coordinates = lineString.getCoordinatesRO();
+    TFHECoordinateSequence coordinates = lineString.getCoordinates();
     long numCoordinates = coordinates.size();
 
     CipherGeometryOutputStream outputStream =
@@ -165,14 +165,14 @@ public class CipherGeometrySerializer {
       outputStream.putInt((int) exteriorRing.getNumPoints());
 
       // Serialize all coordinates
-      TFHECoordinateSequence coordinates = exteriorRing.getCoordinatesRO();
+      TFHECoordinateSequence coordinates = exteriorRing.getCoordinates();
       outputStream.putCoordinates(coordinates);
 
       // Write interior rings
       for (int i = 0; i < numInteriorRings; i++) {
         TFHELinearRing innerRing = polygon.getInteriorRingN(i);
         outputStream.putInt((int) innerRing.getNumPoints());
-        outputStream.putCoordinates(innerRing.getCoordinatesRO());
+        outputStream.putCoordinates(innerRing.getCoordinates());
       }
     } else {
       outputStream.putInt(0);

@@ -19,9 +19,11 @@
 package org.apache.sedona.common.fhe;
 
 import org.ade.SpatialFHE.spatialfhe.TFHEBool;
+import org.ade.SpatialFHE.spatialfhe.TFHEInt32;
 
 public class FHEDecrypt {
   public static boolean decrypt_bool(TFHEBool input) {
+    TFHEInt32.javaGetContext().setServerKey();
     return input.decrypt();
   }
 }

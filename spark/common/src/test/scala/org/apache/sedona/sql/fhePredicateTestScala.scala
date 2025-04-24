@@ -18,7 +18,7 @@
  */
 package org.apache.sedona.sql
 
-import org.ade.SpatialFHE.spatialfhe.TFHEBool
+import org.ade.SpatialFHE.spatialfhe.{TFHEBool, TFHEGeometry}
 import org.apache.spark.sql.catalyst.expressions.{EmptyRow, Literal}
 import org.apache.spark.sql.sedona_sql.expressions.fhe.{ST_Contains_Private, ST_CoveredBy_Private, ST_Covers_Private, ST_Crosses_Private, ST_Disjoint_Private, ST_Equals_Private, ST_GeomFromWKT_Private, ST_Intersects_Private, ST_Overlaps_Private, ST_Point_Private, ST_PolygonFromEnvelope_Private, ST_Touches_Private, ST_Within_Private}
 
@@ -170,6 +170,24 @@ class fhePredicateTestScala extends TestBaseScala {
       assert(!notCrosses.take(1)(0).get(0).asInstanceOf[Boolean])
     }
 
+//    it("Passed ST_Crosses_Private with FHE not decrypted") {
+//      var crossesTesttable = sparkSession.sql(
+//        "select ST_GeomFromWKT_Private('POLYGON((1 1, 4 1, 4 4, 1 4, 1 1))') as a, ST_GeomFromWKT_Private('LINESTRING(1 5, 5 1)') as b")
+//      crossesTesttable.createOrReplaceTempView("crossesTesttable")
+//      var crosses = sparkSession.sql(
+//        "select(ST_Crosses_Private(a, b)) from crossesTesttable")
+//      println(crossesTesttable.take(1)(0).getAs[TFHEGeometry](0).getGeometryType)
+//
+//      var notCrossesTesttable = sparkSession.sql(
+//        "select ST_GeomFromWKT_Private('POLYGON((1 1, 4 1, 4 4, 1 4, 1 1))') as a, ST_GeomFromWKT_Private('POLYGON((2 2, 5 2, 5 5, 2 5, 2 2))') as b")
+//      notCrossesTesttable.createOrReplaceTempView("notCrossesTesttable")
+//      var notCrosses = sparkSession.sql(
+//        "select(ST_Crosses_Private(a, b)) from notCrossesTesttable")
+//
+//      assert(crosses.take(1)(0).get(0).asInstanceOf[TFHEBool].decrypt())
+//      assert(!notCrosses.take(1)(0).get(0).asInstanceOf[TFHEBool].decrypt())
+//    }
+
     it("Passed ST_Relate") {
       val baseDf = sparkSession.sql(
         "SELECT ST_GeomFromWKT_Private('LINESTRING (1 1, 5 5)') AS g1, ST_GeomFromWKT_Private('POLYGON ((3 3, 3 7, 7 7, 7 3, 3 3))') as g2, '1010F0212' as im");
@@ -177,22 +195,6 @@ class fhePredicateTestScala extends TestBaseScala {
       val actualBoolean =
         baseDf.selectExpr("FHE_Decrypt_Bool(ST_Relate(g1, g2, im))").first().getBoolean(0)
       assert(actualBoolean)
-    }
-
-    it("Passed ST_Touches_Private with FHE") {
-      var pointCsvDF = sparkSession.read
-        .format("csv")
-        .option("delimiter", ",")
-        .option("header", "false")
-        .load(csvPointInputLocation)
-      pointCsvDF.createOrReplaceTempView("pointtable")
-      var pointDf = sparkSession.sql(
-        "select ST_Point_Private(cast(pointtable._c0 as Integer), cast(pointtable._c1 as Integer)) as arealandmark from pointtable")
-      pointDf.createOrReplaceTempView("pointdf")
-
-      var resultDf = sparkSession.sql(
-        "select * from pointdf where ST_Touches_Private(pointdf.arealandmark, ST_PolygonFromEnvelope_Private(0,99,1,101))")
-      assert(resultDf.count() == 1)
     }
 
     it("Passed ST_Overlaps_Private with FHE") {

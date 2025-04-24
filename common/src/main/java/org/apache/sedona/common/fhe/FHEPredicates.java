@@ -20,47 +20,58 @@ package org.apache.sedona.common.fhe;
 
 import org.ade.SpatialFHE.spatialfhe.TFHEBool;
 import org.ade.SpatialFHE.spatialfhe.TFHEGeometry;
+import org.ade.SpatialFHE.spatialfhe.TFHEInt32;
 import org.ade.SpatialFHE.spatialfhe.TFHEIntersectionMatrix;
 
 public class FHEPredicates {
 
   public static TFHEBool contains(TFHEGeometry leftGeometry, TFHEGeometry rightGeometry) {
+    TFHEInt32.javaGetContext().setServerKey();
     return leftGeometry.contains(rightGeometry);
   }
 
   public static TFHEBool intersects(TFHEGeometry leftGeometry, TFHEGeometry rightGeometry) {
+    TFHEInt32.javaGetContext().setServerKey();
     return leftGeometry.intersects(rightGeometry);
   }
 
   public static TFHEBool within(TFHEGeometry leftGeometry, TFHEGeometry rightGeometry) {
+    TFHEInt32.javaGetContext().setServerKey();
     return leftGeometry.within(rightGeometry);
   }
 
   public static TFHEBool covers(TFHEGeometry leftGeometry, TFHEGeometry rightGeometry) {
+    TFHEInt32.javaGetContext().setServerKey();
     return leftGeometry.covers(rightGeometry);
   }
 
   public static TFHEBool coveredBy(TFHEGeometry leftGeometry, TFHEGeometry rightGeometry) {
+    TFHEInt32.javaGetContext().setServerKey();
     return leftGeometry.coveredBy(rightGeometry);
   }
 
   public static TFHEBool crosses(TFHEGeometry leftGeometry, TFHEGeometry rightGeometry) {
+    TFHEInt32.javaGetContext().setServerKey();
     return leftGeometry.crosses(rightGeometry);
   }
 
   public static TFHEBool overlaps(TFHEGeometry leftGeometry, TFHEGeometry rightGeometry) {
+    TFHEInt32.javaGetContext().setServerKey();
     return leftGeometry.overlaps(rightGeometry);
   }
 
   public static TFHEBool touches(TFHEGeometry leftGeometry, TFHEGeometry rightGeometry) {
+    TFHEInt32.javaGetContext().setServerKey();
     return leftGeometry.touches(rightGeometry);
   }
 
   public static TFHEBool equals(TFHEGeometry leftGeometry, TFHEGeometry rightGeometry) {
+    TFHEInt32.javaGetContext().setServerKey();
     return leftGeometry.equals(rightGeometry);
   }
 
   public static TFHEBool disjoint(TFHEGeometry leftGeometry, TFHEGeometry rightGeometry) {
+    TFHEInt32.javaGetContext().setServerKey();
     return leftGeometry.disjoint(rightGeometry);
   }
 
@@ -70,11 +81,13 @@ public class FHEPredicates {
 
   public static boolean relate(
       TFHEGeometry leftGeometry, TFHEGeometry rightGeometry, String intersectionMatrix) {
+    TFHEInt32.javaGetContext().setServerKey();
     TFHEIntersectionMatrix matrixFromGeom = leftGeometry.relate(rightGeometry);
     return matrixFromGeom.matches(intersectionMatrix);
   }
 
   public static boolean relateMatch(String matrix1, String matrix2) {
+    TFHEInt32.javaGetContext().setServerKey();
     return TFHEIntersectionMatrix.matches(matrix1, matrix2);
   }
 }

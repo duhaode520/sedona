@@ -29,17 +29,20 @@ public class FHEConstructors {
     if (wkt == null) {
       return null;
     }
+    TFHEInt32.javaGetContext().setServerKey();
     return new WKTReader(GEOMETRY_FACTORY).read(wkt);
   }
 
   public static TFHEGeometry point(double x, double y) {
     // See srid parameter discussion in https://issues.apache.org/jira/browse/SEDONA-234
+    TFHEInt32.javaGetContext().setServerKey();
     return GEOMETRY_FACTORY.createPoint(
         new TFHECoordinate(new TFHEInt32((int) x), new TFHEInt32((int) y)));
   }
 
   public static TFHEGeometry polygonFromEnvelope(
       double minX, double minY, double maxX, double maxY) {
+    TFHEInt32.javaGetContext().setServerKey();
     TFHECoordinate[] coordinates = new TFHECoordinate[5];
     coordinates[0] = new TFHECoordinate(new TFHEInt32((int) minX), new TFHEInt32((int) minY));
     coordinates[1] = new TFHECoordinate(new TFHEInt32((int) minX), new TFHEInt32((int) maxY));
