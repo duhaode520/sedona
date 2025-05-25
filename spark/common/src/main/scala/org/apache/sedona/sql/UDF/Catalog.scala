@@ -355,6 +355,7 @@ object Catalog {
     function[RS_Subtract_Private](),
     function[RS_Multiply_Private](),
     function[RS_Multiply_PrivatePlain](),
+    function[RS_MultiplyFactor_PrivatePlain](),
     function[RS_BandAsCipherMat]())
 
   // Aggregate functions with Geometry as buffer

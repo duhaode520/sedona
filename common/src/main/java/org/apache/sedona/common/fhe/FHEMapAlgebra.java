@@ -94,6 +94,24 @@ public class FHEMapAlgebra {
     ensureBandShape(cipher_band1.getWidth() * cipher_band1.getHeight(), plain_band2.length);
     return fheHelper.getManager().multiplyMatPlain(cipher_band1, new DoubleVector(plain_band2));
   }
+  
+
+  /**
+   * Multiplies an encrypted band by a plaintext factor.
+   *
+   * @param cipher_band The CipherMat object representing the encrypted band.
+   * @param factor The plaintext factor to multiply with.
+   * @return A CipherMat object representing the product of the band and factor.
+   */
+  public static CipherMat multiplyFactorPrivatePlain(CipherMat cipher_band, double factor) {
+    FHEHelper fheHelper = FHEHelper.getInstance();
+    // Create a vector with the same factor repeated for all elements
+    double[] factorArray = new double[cipher_band.getWidth() * cipher_band.getHeight()];
+    for (int i = 0; i < factorArray.length; i++) {
+      factorArray[i] = factor;
+    }
+    return fheHelper.getManager().multiplyMatPlain(cipher_band, new DoubleVector(factorArray));
+  }
 
   /**
    * Throws an IllegalArgumentException if the lengths of the bands are not the same.

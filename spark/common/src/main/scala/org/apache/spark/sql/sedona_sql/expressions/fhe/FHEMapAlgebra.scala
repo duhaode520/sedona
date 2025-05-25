@@ -62,6 +62,13 @@ case class RS_Multiply_PrivatePlain(inputExpressions: Seq[Expression])
   }
 }
 
+case class RS_MultiplyFactor_PrivatePlain(inputExpressions: Seq[Expression])
+    extends InferredExpression(FHEMapAlgebra.multiplyFactorPrivatePlain _) {
+  protected def withNewChildrenInternal(newChildren: IndexedSeq[Expression]) = {
+    copy(inputExpressions = newChildren)
+  }
+}
+
 case class RS_BandAsCipherMat(inputExpressions: Seq[Expression])
     extends InferredExpression(FHEMapAlgebra.bandAsCipherMat _) {
   protected def withNewChildrenInternal(newChildren: IndexedSeq[Expression]) = {
